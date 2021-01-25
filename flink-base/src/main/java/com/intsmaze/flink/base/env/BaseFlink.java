@@ -71,12 +71,11 @@ public abstract class BaseFlink {
         if (StringUtils.isBlank(isLocal)) {
             env.getConfig().setRestartStrategy(RestartStrategies.fixedDelayRestart(4, 10000));
             String isIncremental = params.get("isIncremental");
-            Preconditions.checkNotNull(isIncremental, "isIncremental is null");
+//            Preconditions.checkNotNull(isIncremental, "isIncremental is null");
             StateBackend stateBackend;
             String hadoopIp = properties.getProperty("hadoopIp");
             if ("isIncremental".equals(isIncremental)) {
                 //如果本地调试，必须指定hdfs的端口信息，且要依赖hadoop包，如果集群执行，flink与hdfs在同一集群，那么可以不指定hdfs端口信息，也不用将hadoop打进jar包。
-//           stateBackend=new RocksDBStateBackend("hdfs://centos-Reall-131:9000/home/intsmaze/flink/", true);
                 stateBackend = new RocksDBStateBackend("hdfs:///home/intsmaze/flink/" + getJobName(), true);
                 env.setStateBackend(stateBackend);
             } else if ("full".equals(isIncremental)) {
@@ -141,7 +140,7 @@ public abstract class BaseFlink {
         properties.setProperty("group.id", id);
         System.out.println("-------------->>>>>>>>>>>>>>>>>> consumer name is :" + id);
         FlinkKafkaConsumer<String> stringFlinkKafkaConsumer = new FlinkKafkaConsumer<>(topic, new SimpleStringSchema(), properties);
-        return env.addSource(stringFlinkKafkaConsumer).map(new InnerMap());
+        return env.addSource(stringFlinkKafkaConsumer);
     }
 
 
